@@ -1,0 +1,48 @@
+name: Trading Bot Execution
+
+on:
+  schedule:
+    # Cada 5 minutos
+    - cron: '*/5 * * * *'
+  workflow_dispatch:  # Permitir ejecución manual
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10  # Timeout controlado
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Trading Bot
+        env:
+          TRADING_MODE: ${{ secrets.TRADING_MODE }}
+          EXCHANGE: ${{ secrets.EXCHANGE }}
+          API_KEY: ${{ secrets.API_KEY }}
+          API_SECRET: ${{ secrets.API_SECRET }}
+          USE_TESTNET: ${{ secrets.USE_TESTNET }}
+          HTTP_PROXY: ${{ secrets.HTTP_PROXY }}
+          HTTPS_PROXY: ${{ secrets.HTTPS_PROXY }}
+          SYMBOL: ${{ secrets.SYMBOL }}
+          AMOUNT_PERCENT: ${{ secrets.AMOUNT_PERCENT }}
+          MAX_DAILY_LOSS: ${{ secrets.MAX_DAILY_LOSS }}
+          # ... otras variables
+        run: python main.py
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trading-logs
+          path: logs/
