@@ -1,5 +1,5 @@
-ccxt
 requests
-pandas
-numpy
 python-dotenv
+ccxt==4.3.82
+pandas==2.2.2
+numpy==1.26.4
